@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CASA PINGUERAL — Visor 3D</title>
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <style>
+    html,body { height:100%; margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial; background: #111; color:#fff; }
+    .wrapper { display:flex; flex-direction:column; height:100vh; gap:12px; padding:16px; box-sizing:border-box; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    h1 { font-size:18px; margin:0; }
+    .controls { display:flex; gap:8px; align-items:center; }
+    button { background:#222; border:1px solid #333; color:#fff; padding:8px 12px; border-radius:8px; cursor:pointer; }
+    button:active { transform:translateY(1px); }
+    model-viewer { width:100%; height:calc(100vh - 120px); border-radius:12px; background: linear-gradient(180deg,#0b0b0f 0%, #121217 100%); box-shadow:0 6px 30px rgba(0,0,0,0.6); }
+    footer { font-size:13px; opacity:0.9; display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    .badge { font-size:12px; opacity:0.9; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <header>
+      <h1>CASA PINGUERAL — Visor 3D</h1>
+      <div class="controls">
+        <button id="toggle-rotate">Detener rotación</button>
+        <button id="set-sunset">Iluminación: Atardecer</button>
+        <button id="set-neutral">Iluminación: Neutra</button>
+        <a id="download-link" href="CASA PINGUERAL 6 web.glb" download style="text-decoration:none"><button>Descargar GLB</button></a>
+      </div>
+    </header>
+
+    <!-- Replace the src value with the exact filename of your .glb in the same folder -->
+    <model-viewer id="viewer"
+      src="CASA PINGUERAL 6 web.glb"
+      alt="Modelo 3D — CASA PINGUERAL"
+      camera-controls
+      auto-rotate
+      rotation-per-second="30deg"
+      exposure="1.0"
+      shadow-intensity="1"
+      ar
+      ar-modes="webxr scene-viewer quick-look"
+      style="background:transparent;">
+      <!-- Fallback content for older browsers -->
+      <div class="badge">Tu navegador no soporta <code>&lt;model-viewer&gt;</code>.</div>
+    </model-viewer>
+
+    <footer>
+      <div class="badge">Sube este archivo HTML y el .glb al mismo directorio en tu servidor.</div>
+      <div class="badge">Sugerencia: para mejores luces y reflexiones, añade un environment-image HDR (opcional).</div>
+    </footer>
+  </div>
+
+  <script>
+    const viewer = document.getElementById('viewer');
+    const btnRotate = document.getElementById('toggle-rotate');
+    const btnSunset = document.getElementById('set-sunset');
+    const btnNeutral = document.getElementById('set-neutral');
+
+    // Toggle auto-rotate
+    btnRotate.addEventListener('click', () => {
+      if (viewer.hasAttribute('auto-rotate')) {
+        viewer.removeAttribute('auto-rotate');
+        btnRotate.textContent = 'Iniciar rotación';
+      } else {
+        viewer.setAttribute('auto-rotate', '');
+        btnRotate.textContent = 'Detener rotación';
+      }
+    });
+
+    // Apply a warm "sunset" environment by adjusting exposure and shadow
+    btnSunset.addEventListener('click', () => {
+      viewer.setAttribute('exposure', '1.2');
+      viewer.setAttribute('shadow-intensity', '1');
+      // gentle camera orbit for a nicer initial view
+      viewer.cameraOrbit = "0deg 75deg 2.5m";
+      // optional: if you host an HDR environment, set it like:
+      // viewer.environmentImage = 'path/to/sunset.hdr';
+    });
+
+    // Neutral lighting
+    btnNeutral.addEventListener('click', () => {
+      viewer.setAttribute('exposure', '1.0');
+      viewer.setAttribute('shadow-intensity', '0.9');
+      viewer.cameraOrbit = "45deg 75deg 2.8m";
+    });
+
+    // Improve initial load UX by showing a simple message while model loads
+    viewer.addEventListener('progress', (ev) => {
+      // progress.loaded / progress.total are bytes; you could show a progress bar here
+    });
+
+    // When user clicks the model, toggle UI visibility to get a clean screenshot
+    viewer.addEventListener('click', () => {
+      document.querySelector('header').classList.toggle('hidden');
+      document.querySelector('footer').classList.toggle('hidden');
+    });
+  </script>
+</body>
+</html>
